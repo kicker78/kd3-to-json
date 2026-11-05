@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>old hattrick kits, back in use</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --turf: #1b4d33;
+    --turf-dark: #17432c;
+    --chalk: #f4f6f3;
+    --chalk-dim: #c9d6cc;
+    --line: rgba(244, 246, 243, .85);
+    --ink: #0f2a1b;
+    --flag: #ffd23f;
+    --error: #ffb4a8;
+    --font: "Barlow Semi Condensed", "Arial Narrow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font);
+    font-size: 1.125rem;
+    line-height: 1.5;
+    color: var(--chalk);
+    background:
+      repeating-linear-gradient(90deg, var(--turf) 0 64px, var(--turf-dark) 64px 128px);
+  }
+  main { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.25rem 4rem; }
+  h1 {
+    font-size: clamp(2.4rem, 7vw, 3.75rem);
+    line-height: 1.02;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 0 0 1rem;
+  }
+  h2 { font-size: 1.4rem; font-weight: 700; margin: 0 0 .5rem; }
+  p { margin: 0 0 1rem; max-width: 38rem; }
+  .lede { font-size: 1.3rem; color: var(--chalk); }
+
+  /* The drop target is a penalty box in chalk lines. */
+  .box {
+    position: relative;
+    margin: 2.25rem 0 1.5rem;
+    min-height: 15rem;
+    border: 3px solid var(--line);
+    border-bottom-width: 3px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 2rem 1.25rem 3.5rem;
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+  .box::before {            /* six-yard box */
+    content: "";
+    position: absolute;
+    left: 50%; top: -3px;
+    width: min(46%, 15rem); height: 4.25rem;
+    transform: translateX(-50%);
+    border: 3px solid var(--line);
+    border-top: 0;
+  }
+  .box::after {             /* penalty arc */
+    content: "";
+    position: absolute;
+    left: 50%; bottom: -3px;
+    width: 8rem; height: 4rem;
+    transform: translateX(-50%);
+    border: 3px solid var(--line);
+    border-bottom: 0;
+    border-radius: 8rem 8rem 0 0;
+    background: transparent;
+  }
+  .box:hover, .box.over { background-color: rgba(255, 255, 255, .08); }
+  .box:focus-within { outline: 3px solid var(--flag); outline-offset: 6px; }
+  .box strong { display: block; font-size: 1.6rem; font-weight: 700; margin-top: 2.25rem; }
+  .box span.hint { color: var(--chalk-dim); font-size: 1rem; }
+  .box .pick { margin-top: .85rem; position: relative; z-index: 1; }
+  .box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .box input[type=file]::-webkit-file-upload-button { cursor: pointer; }
+
+  button, .btn {
+    font: inherit;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--chalk);
+    border: 0;
+    padding: .6rem 1.1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+  button:hover, .btn:hover { background: #fff; }
+  button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 3px solid var(--flag); outline-offset: 3px; }
+
+  #results { display: grid; gap: 1rem; margin: 0 0 3rem; padding: 0; list-style: none; }
+  .result {
+    background: rgba(8, 28, 17, .72);
+    border-left: 6px solid var(--flag);
+    padding: 1rem 1.25rem 1.1rem;
+  }
+  .result.fail { border-left-color: var(--error); }
+  .result h3 { margin: 0 0 .15rem; font-size: 1.25rem; font-weight: 700; word-break: break-word; }
+  .result p { margin: 0 0 .6rem; color: var(--chalk-dim); }
+  .result .detail { color: var(--chalk); }
+  .fills { display: flex; gap: 1rem; margin: .5rem 0 .9rem; flex-wrap: wrap; }
+  .fill { display: flex; align-items: center; gap: .5rem; font-size: 1rem; color: var(--chalk-dim); }
+  .fill i { width: 1.6rem; height: 1.6rem; border: 2px solid var(--chalk); display: inline-block; }
+  .fail p { color: var(--error); }
+
+  section.notes { max-width: 38rem; border-top: 3px solid var(--line); padding-top: 1.5rem; }
+  section.notes p { color: var(--chalk-dim); }
+  noscript, .nosupport { color: var(--error); }
+  @media (prefers-reduced-motion: reduce) { .box { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Old Hattrick kits, back in use</h1>
+  <p class="lede">Drop a .kd3 file from the old kit designer and get a JSON file in the new designer's format. The conversion runs in your browser, so your files are never uploaded.</p>
+
+  <label class="box" id="drop">
+    <strong>Drop .kd3 files here</strong>
+    <span class="hint">or choose them from your computer. You can convert several at once.</span>
+    <span class="pick btn">Choose files</span>
+    <input id="file" type="file" accept=".kd3" multiple aria-label="Choose .kd3 kit files">
+  </label>
+
+  <p class="nosupport" id="nosupport" hidden>This browser can't unpack .kd3 files. Open the page in a current version of Chrome, Edge, Firefox or Safari.</p>
+  <noscript><p>This page needs JavaScript to convert files.</p></noscript>
+
+  <ul id="results" aria-live="polite"></ul>
+
+  <section class="notes">
+    <h2>How close is the result?</h2>
+    <p>Positions, sizes, colors, text and gradients all carry over. For one kit the new designer converted itself, every shape matched. On other kits the shading can look a little stronger than it did in the old designer.</p>
+    <p>The old format has no room for images, so crests and logos that were bitmaps are not included. Player numbers drawn by the game are not part of the file either.</p>
+  </section>
+</main>
+
+<script>
+/* ---------- Converter: .kd3 (old Flash kit designer) -> new designer JSON ----------
+   Layer 1: zlib. Layer 2: XOR with a repeating 4-byte key. Layer 3: ActionScript
+   ByteArray (big-endian ints, floats, writeUTF strings). */
+const KEY = [0x50, 0xE6, 0xA3, 0x25];
+const LINEAR_MODE = 'css'; // linear gradient direction = old angle + 90
+
+async function inflate(buf) {
+  if (typeof DecompressionStream === 'undefined') throw new Error('unsupported');
+  const stream = new Blob([buf]).stream().pipeThrough(new DecompressionStream('deflate'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function pyRound(x) {                       // round half to even, to match the reference converter
+  const r = Math.round(x);
+  return (Math.abs(x % 1) === 0.5 && r % 2 !== 0) ? r - 1 : r;
+}
+const rgb = c => (c & 0xFFFFFF).toString(16).padStart(6, '0');
+const a8 = a => Math.max(0, Math.min(255, pyRound(a * 255))).toString(16).padStart(2, '0');
+const f6 = v => Number(v.toFixed(6));
+function bitsToFloat(i) {
+  const dv = new DataView(new ArrayBuffer(4)); dv.setInt32(0, i); return dv.getFloat32(0);
+}
+
+function parseKd3(b) {
+  const dv = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  const dec = new TextDecoder('utf-8', { fatal: true });
+  let o = 6;
+  const i32 = () => { const v = dv.getInt32(o); o += 4; return v; };
+  const f32 = () => { const v = dv.getFloat32(o); o += 4; return f6(v); };
+  const utf = () => { const n = dv.getUint16(o); o += 2; const t = dec.decode(b.subarray(o, o + n)); o += n; return t; };
+  const hdr = { scale: f32(), a: i32(), b: i32(), color: i32(), c: i32() };
+  const layers = [];
+  while (b.length - o > 8) {
+    const L = { id: i32(), shape: i32() };
+    L.p = Array.from({ length: 6 }, i32);
+    L.q = Array.from({ length: 4 }, i32);
+    L.alpha1 = f32(); L.color = i32(); L.alpha2 = f32();
+    L.angle = i32();
+    L.g = Array.from({ length: 3 }, i32);
+    const n = i32();
+    if (n < 0 || n > 32) throw new Error('bad stop count');
+    L.stops = [];
+    for (let k = 0; k < n; k++) L.stops.push({ color: i32(), alpha: f32(), ratio: i32() });
+    L.text = utf(); L.font = utf(); L.size = i32();
+    layers.push(L);
+  }
+  return { hdr, layers };
+}
+
+function gradient(stops, radial, angle) {
+  const parts = [...stops].sort((s, t) => s.ratio - t.ratio).map(s => {
+    const r = s.ratio / 255;
+    return `#${rgb(s.color)}${a8(s.alpha)}-${r}`;
+  });
+  const head = radial ? '@r,0.5,0.5,' : `@l,${(angle + 90) % 360},`;
+  return head + parts.join(',');
+}
+
+function convertLayer(l) {
+  const p = l.p, q = l.q;
+  const type = String(p[5]);
+  const s = {
+    strokeWidth: bitsToFloat(q[2]),
+    text: null,
+    type,
+    scaleX: p[1], skewX: q[0],
+    scaleY: p[2], x: l.shape - 10,
+    rotation: p[4], y: p[0] - 12,
+    skewY: q[1],
+    fillcolor: null, gradient: null,
+    strokeColor: '#' + rgb(q[3]) + a8(l.alpha1),
+  };
+  // color == -1 (0xFFFFFFFF) means "no solid fill": use the gradient. Any real color is a solid fill.
+  if (l.color === -1 && l.stops.length) s.gradient = gradient(l.stops, l.g[0] === 1, l.angle);
+  else if (l.color !== -1) s.fillcolor = '#' + rgb(l.color) + a8(l.alpha2);
+  if (type === '999') s.text = { text: l.text, font: l.font, size: `${l.size}pt` };
+  return s;
+}
+
+async function convertKd3(arrayBuffer) {
+  let raw;
+  try { raw = await inflate(arrayBuffer); }
+  catch (e) { if (e.message === 'unsupported') throw e; throw new Error('Not a .kd3 file: the contents could not be unpacked.'); }
+  const data = raw.map((v, i) => v ^ KEY[i % 4]);
+  let parsed;
+  try { parsed = parseKd3(data); }
+  catch (e) { throw new Error('The file unpacked, but its layers could not be read. It may use a variation of the format that is not supported yet.'); }
+  const { hdr, layers } = parsed;
+  if (!layers.length) throw new Error('No kit layers were found in this file.');
+  const fills = {
+    shirt_fill: '#' + rgb(hdr.a) + 'ff',
+    pants_fill: '#' + rgb(hdr.b) + 'ff',
+    socks_fill: '#' + rgb(hdr.color) + 'ff',
+  };
+  const front = layers.filter(l => l.id < 100).map(convertLayer);
+  const back = layers.filter(l => l.id >= 100).map(convertLayer);
+  const json = {
+    frontView: { ...fills, shapes: front },
+    backView: { ...fills, shapes: back },
+    shading3d: false,
+  };
+  const texts = layers.filter(l => String(l.p[5]) === '999').map(l => l.text.trim()).filter(Boolean);
+  return { json, fills, counts: { front: front.length, back: back.length }, texts };
+}
+if (typeof module !== 'undefined') module.exports = { convertKd3 };
+
+/* ---------- Page ---------- */
+if (typeof document !== 'undefined') {
+  const drop = document.getElementById('drop');
+  const input = document.getElementById('file');
+  const results = document.getElementById('results');
+  if (typeof DecompressionStream === 'undefined') document.getElementById('nosupport').hidden = false;
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
+  async function handle(file) {
+    const li = document.createElement('li');
+    li.className = 'result';
+    results.prepend(li);
+    li.innerHTML = `<h3>${esc(file.name)}</h3><p>Converting…</p>`;
+    try {
+      const out = await convertKd3(await file.arrayBuffer());
+      const name = file.name.replace(/\.kd3$/i, '') + '.json';
+      const blob = new Blob([JSON.stringify(out.json, null, 1)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const swatch = (label, hex) => `<span class="fill"><i style="background:${esc(hex.slice(0, 7))}"></i>${label}</span>`;
+      li.innerHTML =
+        `<h3>${esc(file.name)}</h3>` +
+        `<p>${plural(out.counts.front, 'layer')} on the front, ${plural(out.counts.back, 'layer')} on the back.</p>` +
+        `<div class="fills">${swatch('Shirt', out.fills.shirt_fill)}${swatch('Shorts', out.fills.pants_fill)}${swatch('Socks', out.fills.socks_fill)}</div>` +
+        (out.texts.length ? `<p class="detail">Text on the kit: ${out.texts.map(esc).join(', ')}</p>` : '') +
+        `<a class="btn" href="${url}" download="${esc(name)}">Download ${esc(name)}</a>`;
+    } catch (e) {
+      li.classList.add('fail');
+      const msg = e.message === 'unsupported'
+        ? "This browser can't unpack the file. Try a current version of Chrome, Edge, Firefox or Safari."
+        : e.message;
+      li.innerHTML = `<h3>${esc(file.name)}</h3><p>${esc(msg)}</p>`;
+    }
+  }
+  function handleAll(files) { [...files].forEach(handle); }
+
+  input.addEventListener('change', () => { handleAll(input.files); input.value = ''; });
+  ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => handleAll(e.dataTransfer.files));
+}
+</script>
+</body>
+</html>
+<!-- this was 100% written by claude with some clever prompts and help from kralw and vstheworld -->
