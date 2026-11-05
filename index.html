@@ -46,14 +46,14 @@
   /* The drop target is a penalty box in chalk lines. */
   .box {
     position: relative;
-    margin: 2.25rem 0 1.5rem;
+    margin: 2.25rem 0 5.75rem;           /* room for the arc below the box */
     min-height: 15rem;
     border: 3px solid var(--line);
     border-bottom-width: 3px;
     display: grid;
     place-items: center;
     text-align: center;
-    padding: 2rem 1.25rem 3.5rem;
+    padding: 2rem 1.25rem 2.25rem;
     cursor: pointer;
     transition: background-color .15s ease;
   }
@@ -66,15 +66,15 @@
     border: 3px solid var(--line);
     border-top: 0;
   }
-  .box::after {             /* penalty arc */
+  .box::after {             /* penalty arc: outside the box, curving away from goal */
     content: "";
     position: absolute;
-    left: 50%; bottom: -3px;
+    left: 50%; top: 100%;
     width: 8rem; height: 4rem;
     transform: translateX(-50%);
     border: 3px solid var(--line);
-    border-bottom: 0;
-    border-radius: 8rem 8rem 0 0;
+    border-top: 0;
+    border-radius: 0 0 8rem 8rem;
     background: transparent;
   }
   .box:hover, .box.over { background-color: rgba(255, 255, 255, .08); }
